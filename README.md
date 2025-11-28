@@ -47,4 +47,4 @@ O DER foi desenvolvido na Atividade II e utilizado aqui como base para a impleme
 
 1. **Clone o repositório**
    ```bash
-   git clone <URL_DO_SEU_REPOSITORIO>
+   git clone <[URL_DO_SEU_REPOSITORIO](https://github.com/grazicarvalho3105-commits/ClinVida-SQL)>
