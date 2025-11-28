@@ -1,0 +1,184 @@
+USE ClinVida;
+
+-- 1. Remover um prontuário
+DELETE FROM Prontuario
+WHERE ProntuarioID = 3;
+
+-- 2. Remover uma consulta (precisa ter o prontuário apagado antes)
+DELETE FROM Consulta
+WHERE ConsultaID = 3;
+
+-- 3. Remover paciente sem dependências
+DELETE FROM Paciente
+WHERE PacienteID = 3;
+
+# ClinVida – Projeto SQL (Mini-mundo)
+
+Este repositório contém todos os scripts SQL desenvolvidos para o projeto da clínica **ClinVida**, incluindo criação de tabelas, inserção de dados, consultas e manipulação (UPDATE/DELETE).
+
+---
+
+## 🏥 Sobre o Mini-mundo ClinVida
+
+A ClinVida é uma clínica médica que realiza consultas, registra prontuários e permite emissão de segunda opinião.  
+Os principais participantes do sistema são:
+
+- Pacientes  
+- Médicos  
+- Especialidades  
+- Consultas  
+- Prontuários  
+- Endereços  
+- Solicitações de segunda opinião  
+
+O DER foi desenvolvido na Atividade II e utilizado aqui como base para a implementação do banco de dados relacional.
+
+---
+
+## 📂 Arquivos do Repositório
+
+| Arquivo | Descrição |
+|--------|-----------|
+| `01_create_tables.sql` | Script de criação de todas as tabelas utilizando DDL |
+| `02_insert_data.sql` | Comandos de inserção (INSERT) para povoamento inicial |
+| `03_select_queries.sql` | Consultas SELECT (JOIN, WHERE, ORDER BY etc.) |
+| `04_updates.sql` | Comandos UPDATE com condições |
+| `05_deletes.sql` | Comandos DELETE com condições |
+| `DER_ClinVida.png` | Imagem do DER utilizado no projeto |
+| `README.md` | Documento explicativo do repositório |
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+- MySQL Workbench **ou** PostgreSQL (PGAdmin)
+- SQL (DDL e DML)
+- Git e GitHub para versionamento
+
+---
+
+## 🚀 Como Executar o Projeto
+
+1. **Clone o repositório**
+   ```bash
+   git clone <URL_DO_SEU_REPOSITORIO>
+
+CREATE DATABASE ClinVida;
+USE ClinVida;
+
+-- Tabela de Pacientes
+CREATE TABLE Paciente (
+    PacienteID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100) NOT NULL,
+    DataNascimento DATE NOT NULL,
+    Telefone VARCHAR(20),
+    Endereco VARCHAR(200)
+);
+
+-- Tabela de Especialidades
+CREATE TABLE Especialidade (
+    EspecialidadeID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100) NOT NULL
+);
+
+-- Tabela de Médicos
+CREATE TABLE Medico (
+    MedicoID INT AUTO_INCREMENT PRIMARY KEY,
+    Nome VARCHAR(100) NOT NULL,
+    EspecialidadeID INT NOT NULL,
+    FOREIGN KEY (EspecialidadeID) REFERENCES Especialidade(EspecialidadeID)
+);
+
+-- Tabela de Consultas
+CREATE TABLE Consulta (
+    ConsultaID INT AUTO_INCREMENT PRIMARY KEY,
+    PacienteID INT NOT NULL,
+    MedicoID INT NOT NULL,
+    Data DATE NOT NULL,
+    Horario TIME NOT NULL,
+    FOREIGN KEY (PacienteID) REFERENCES Paciente(PacienteID),
+    FOREIGN KEY (MedicoID) REFERENCES Medico(MedicoID)
+);
+
+-- Tabela de Prontuários
+CREATE TABLE Prontuario (
+    ProntuarioID INT AUTO_INCREMENT PRIMARY KEY,
+    ConsultaID INT NOT NULL,
+    Descricao TEXT NOT NULL,
+    FOREIGN KEY (ConsultaID) REFERENCES Consulta(ConsultaID)
+);
+
+USE ClinVida;
+
+-- Inserção de Pacientes
+INSERT INTO Paciente (Nome, DataNascimento, Telefone, Endereco) VALUES
+('Ana Silva', '1990-05-12', '11995667788', 'Rua das Flores, 123'),
+('Carlos Pereira', '1984-09-22', '11988776655', 'Av. Paulista, 1000'),
+('Beatriz Souza', '2001-01-30', '11944332211', 'Rua Azul, 45');
+
+-- Inserção de Especialidades
+INSERT INTO Especialidade (Nome) VALUES
+('Cardiologia'),
+('Dermatologia'),
+('Pediatria');
+
+-- Inserção de Médicos
+INSERT INTO Medico (Nome, EspecialidadeID) VALUES
+('Dr. João Mendes', 1),
+('Dra. Paula Ramos', 2),
+('Dr. Henrique Lopes', 3);
+
+-- Inserção de Consultas
+INSERT INTO Consulta (PacienteID, MedicoID, Data, Horario) VALUES
+(1, 1, '2025-02-01', '10:00'),
+(2, 2, '2025-02-02', '14:30'),
+(3, 3, '2025-02-03', '09:15');
+
+-- Inserção de Prontuários
+INSERT INTO Prontuario (ConsultaID, Descricao) VALUES
+(1, 'Paciente relata dor torácica leve.'),
+(2, 'Paciente apresenta alergia cutânea.'),
+(3, 'Consulta pediátrica de rotina.');
+
+-- 1. Consulta com JOIN (más obrigatório)
+SELECT p.Nome AS Paciente, m.Nome AS Medico, e.Nome AS Especialidade, c.Data, c.Horario
+FROM Consulta c
+JOIN Paciente p ON c.PacienteID = p.PacienteID
+JOIN Medico m ON c.MedicoID = m.MedicoID
+JOIN Especialidade e ON m.EspecialidadeID = e.EspecialidadeID;
+
+-- 2. Consultas futuras
+SELECT * FROM Consulta
+WHERE Data >= '2025-02-01';
+
+-- 3. Lista de médicos ordenados
+SELECT * FROM Medico
+ORDER BY Nome ASC;
+
+-- 4. Consultas de um paciente específico
+SELECT c.*
+FROM Consulta c
+WHERE PacienteID = 1;
+
+-- 5. Quantidade de consultas por especialidade
+SELECT e.Nome AS Especialidade, COUNT(*) AS TotalConsultas
+FROM Especialidade e
+JOIN Medico m ON e.EspecialidadeID = m.EspecialidadeID
+JOIN Consulta c ON c.MedicoID = m.MedicoID
+GROUP BY e.Nome;
+
+USE ClinVida;
+
+-- Atualizar telefone de um paciente
+UPDATE Paciente
+SET Telefone = '11999998888'
+WHERE PacienteID = 1;
+
+-- Atualizar horário de uma consulta
+UPDATE Consulta
+SET Horario = '11:00'
+WHERE ConsultaID = 1;
+
+-- Atualizar descrição do prontuário
+UPDATE Prontuario
+SET Descricao = 'Atualização: paciente relata melhora dos sintomas.'
+WHERE ProntuarioID = 1;
